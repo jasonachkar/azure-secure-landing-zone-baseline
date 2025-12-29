@@ -1,0 +1,15 @@
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars
+*.tfvars.json
+crash.log
+crash.*.log
+*.bak
+*.tmp
+.DS_Store
+
+!terraform/envs/dev/dev.tfvars
+!terraform/envs/prod/prod.tfvars

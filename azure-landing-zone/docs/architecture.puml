@@ -1,0 +1,44 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam componentStyle rectangle
+skinparam shadowing false
+
+title Azure Secure Landing Zone Baseline
+
+cloud "Azure Subscription" {
+  node "Policy Assignments" as policy
+  node "RBAC (Custom Role + Assignments)" as rbac
+
+  rectangle "Resource Group: core" as rg_core {
+    component "Log Analytics Workspace" as law
+    component "Storage Account (diagnostics)" as st
+  }
+
+  rectangle "Resource Group: network" as rg_net {
+    cloud "Hub VNet" as hub {
+      rectangle "Subnets: app, data, mgmt" as hub_subnets
+      rectangle "AzureFirewallSubnet (optional)" as fw_subnet
+      component "Azure Firewall (optional)" as fw
+    }
+
+    cloud "Spoke VNet" as spoke {
+      rectangle "Subnets: app, data, mgmt" as spoke_subnets
+    }
+
+    component "NSGs per subnet" as nsgs
+    component "VNet Peering" as peering
+  }
+}
+
+hub -down- peering
+spoke -down- peering
+hub_subnets -down- nsgs
+spoke_subnets -down- nsgs
+law -down- st
+policy -down- rg_core
+policy -down- rg_net
+rbac -down- rg_core
+rbac -down- rg_net
+fw_subnet -down- fw
+
+@enduml

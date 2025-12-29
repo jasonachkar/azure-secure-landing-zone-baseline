@@ -1,0 +1,40 @@
+{
+  "name": "storage-disable-public-access",
+  "properties": {
+    "displayName": "Disable blob public access",
+    "policyType": "Custom",
+    "mode": "Indexed",
+    "description": "Prevents storage accounts from allowing blob public access.",
+    "metadata": {
+      "category": "Storage"
+    },
+    "parameters": {
+      "effect": {
+        "type": "String",
+        "allowedValues": [
+          "Audit",
+          "Deny",
+          "Disabled"
+        ],
+        "defaultValue": "Deny"
+      }
+    },
+    "policyRule": {
+      "if": {
+        "allOf": [
+          {
+            "field": "type",
+            "equals": "Microsoft.Storage/storageAccounts"
+          },
+          {
+            "field": "Microsoft.Storage/storageAccounts/allowBlobPublicAccess",
+            "equals": "true"
+          }
+        ]
+      },
+      "then": {
+        "effect": "[parameters('effect')]"
+      }
+    }
+  }
+}

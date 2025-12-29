@@ -1,0 +1,114 @@
+{
+  "name": "deny-internet-ssh-rdp",
+  "properties": {
+    "displayName": "Deny inbound SSH/RDP from Internet",
+    "policyType": "Custom",
+    "mode": "All",
+    "description": "Denies NSG rules that allow inbound SSH or RDP from public sources.",
+    "metadata": {
+      "category": "Network"
+    },
+    "parameters": {
+      "allowedSourceIps": {
+        "type": "Array",
+        "metadata": {
+          "description": "Optional list of allowed source IPs (CIDR) for SSH/RDP exceptions.",
+          "displayName": "Allowed source IPs"
+        },
+        "defaultValue": []
+      },
+      "effect": {
+        "type": "String",
+        "allowedValues": [
+          "Audit",
+          "Deny",
+          "Disabled"
+        ],
+        "defaultValue": "Deny"
+      }
+    },
+    "policyRule": {
+      "if": {
+        "allOf": [
+          {
+            "field": "type",
+            "equals": "Microsoft.Network/networkSecurityGroups/securityRules"
+          },
+          {
+            "field": "Microsoft.Network/networkSecurityGroups/securityRules/access",
+            "equals": "Allow"
+          },
+          {
+            "field": "Microsoft.Network/networkSecurityGroups/securityRules/direction",
+            "equals": "Inbound"
+          },
+          {
+            "anyOf": [
+              {
+                "field": "Microsoft.Network/networkSecurityGroups/securityRules/destinationPortRange",
+                "in": [
+                  "22",
+                  "3389",
+                  "*"
+                ]
+              },
+              {
+                "field": "Microsoft.Network/networkSecurityGroups/securityRules/destinationPortRanges[*]",
+                "contains": "22"
+              },
+              {
+                "field": "Microsoft.Network/networkSecurityGroups/securityRules/destinationPortRanges[*]",
+                "contains": "3389"
+              }
+            ]
+          },
+          {
+            "anyOf": [
+              {
+                "field": "Microsoft.Network/networkSecurityGroups/securityRules/sourceAddressPrefix",
+                "equals": "*"
+              },
+              {
+                "field": "Microsoft.Network/networkSecurityGroups/securityRules/sourceAddressPrefix",
+                "equals": "Internet"
+              },
+              {
+                "field": "Microsoft.Network/networkSecurityGroups/securityRules/sourceAddressPrefix",
+                "equals": "0.0.0.0/0"
+              },
+              {
+                "field": "Microsoft.Network/networkSecurityGroups/securityRules/sourceAddressPrefixes[*]",
+                "contains": "*"
+              },
+              {
+                "field": "Microsoft.Network/networkSecurityGroups/securityRules/sourceAddressPrefixes[*]",
+                "contains": "Internet"
+              },
+              {
+                "field": "Microsoft.Network/networkSecurityGroups/securityRules/sourceAddressPrefixes[*]",
+                "contains": "0.0.0.0/0"
+              }
+            ]
+          },
+          {
+            "not": {
+              "anyOf": [
+                {
+                  "field": "Microsoft.Network/networkSecurityGroups/securityRules/sourceAddressPrefix",
+                  "in": "[parameters('allowedSourceIps')]"
+                },
+                {
+                  "field": "Microsoft.Network/networkSecurityGroups/securityRules/sourceAddressPrefixes[*]",
+                  "in": "[parameters('allowedSourceIps')]"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "then": {
+        "effect": "[parameters('effect')]"
+      }
+    }
+  }
+}

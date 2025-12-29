@@ -1,0 +1,39 @@
+{
+  "name": "audit-vm-disk-encryption",
+  "properties": {
+    "displayName": "Audit VMs without disk encryption",
+    "policyType": "Custom",
+    "mode": "Indexed",
+    "description": "Audits virtual machines that do not use a disk encryption set.",
+    "metadata": {
+      "category": "Compute"
+    },
+    "parameters": {
+      "effect": {
+        "type": "String",
+        "allowedValues": [
+          "Audit",
+          "Disabled"
+        ],
+        "defaultValue": "Audit"
+      }
+    },
+    "policyRule": {
+      "if": {
+        "allOf": [
+          {
+            "field": "type",
+            "equals": "Microsoft.Compute/virtualMachines"
+          },
+          {
+            "field": "Microsoft.Compute/virtualMachines/storageProfile.osDisk.managedDisk.diskEncryptionSet.id",
+            "exists": "false"
+          }
+        ]
+      },
+      "then": {
+        "effect": "[parameters('effect')]"
+      }
+    }
+  }
+}

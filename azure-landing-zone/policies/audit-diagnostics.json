@@ -1,0 +1,42 @@
+{
+  "name": "audit-diagnostics",
+  "properties": {
+    "displayName": "Audit resources without diagnostics",
+    "policyType": "Custom",
+    "mode": "All",
+    "description": "Audits key resources that do not have diagnostic settings enabled.",
+    "metadata": {
+      "category": "Monitoring"
+    },
+    "parameters": {
+      "effect": {
+        "type": "String",
+        "allowedValues": [
+          "AuditIfNotExists",
+          "Disabled"
+        ],
+        "defaultValue": "AuditIfNotExists"
+      }
+    },
+    "policyRule": {
+      "if": {
+        "field": "type",
+        "in": [
+          "Microsoft.Network/virtualNetworks",
+          "Microsoft.Network/networkSecurityGroups",
+          "Microsoft.Storage/storageAccounts"
+        ]
+      },
+      "then": {
+        "effect": "[parameters('effect')]",
+        "details": {
+          "type": "Microsoft.Insights/diagnosticSettings",
+          "existenceCondition": {
+            "field": "Microsoft.Insights/diagnosticSettings/logs[*].enabled",
+            "equals": "true"
+          }
+        }
+      }
+    }
+  }
+}
