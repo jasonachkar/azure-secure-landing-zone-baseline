@@ -1,4 +1,5 @@
 locals {
+  # Load policy JSON so definitions stay source-of-truth in /policies.
   require_tags              = jsondecode(file("${var.policy_path}/require-tags.json"))
   allowed_locations         = jsondecode(file("${var.policy_path}/allowed-locations.json"))
   deny_public_ip            = jsondecode(file("${var.policy_path}/deny-public-ip.json"))
@@ -8,7 +9,9 @@ locals {
   audit_vm_disk_encryption   = jsondecode(file("${var.policy_path}/audit-vm-disk-encryption.json"))
   audit_diagnostics          = jsondecode(file("${var.policy_path}/audit-diagnostics.json"))
 
+  # Centralize effects so we can flip enforcement without rewriting definitions.
   enforcement_effect = var.policy_enforcement_mode
+  # Allow public IPs in dev by switching this policy to Audit only.
   public_ip_effect   = var.allow_public_ip ? "Audit" : var.policy_enforcement_mode
 }
 
@@ -104,6 +107,7 @@ resource "azurerm_policy_assignment" "require_tags" {
   name                 = "${var.name_prefix}-require-tags"
   scope                = var.scope
   policy_definition_id = azurerm_policy_definition.require_tags.id
+  # Keep enforcement controlled via assignment parameters.
   parameters = jsonencode({
     effect = {
       value = local.enforcement_effect

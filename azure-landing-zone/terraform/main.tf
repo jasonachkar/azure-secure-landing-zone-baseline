@@ -1,3 +1,4 @@
+# Used to scope policy and RBAC assignments at the subscription level.
 data "azurerm_subscription" "current" {}
 
 resource "azurerm_resource_group" "core" {
@@ -40,6 +41,7 @@ module "policy" {
   source                  = "./modules/policy"
   name_prefix             = local.name_prefix
   scope                   = data.azurerm_subscription.current.id
+  # Policy JSON stays in /policies and is registered here to keep IaC and rules in sync.
   policy_path             = "${path.module}/../policies"
   allowed_locations       = local.allowed_locations
   policy_enforcement_mode = var.policy_enforcement_mode
@@ -55,6 +57,7 @@ module "rbac" {
 }
 
 locals {
+  # Build maps to drive diagnostics across VNets and NSGs without duplicating blocks.
   vnet_ids = {
     hub   = module.networking.hub_vnet_id
     spoke = module.networking.spoke_vnet_id
@@ -74,6 +77,8 @@ resource "azurerm_monitor_diagnostic_setting" "vnet" {
   name                       = "${local.name_prefix}-diag-vnet-${each.key}"
   target_resource_id         = each.value
   log_analytics_workspace_id = module.logging.log_analytics_workspace_id
+
+  # Enable all supported logs/metrics for baseline visibility.
 
   dynamic "enabled_log" {
     for_each = data.azurerm_monitor_diagnostic_categories.vnet[each.key].logs
@@ -104,6 +109,8 @@ resource "azurerm_monitor_diagnostic_setting" "nsg" {
   target_resource_id         = each.value
   log_analytics_workspace_id = module.logging.log_analytics_workspace_id
 
+  # Enable all supported logs/metrics for baseline visibility.
+
   dynamic "enabled_log" {
     for_each = data.azurerm_monitor_diagnostic_categories.nsg[each.key].logs
     content {
@@ -131,6 +138,8 @@ resource "azurerm_monitor_diagnostic_setting" "storage" {
   target_resource_id         = module.logging.storage_account_id
   log_analytics_workspace_id = module.logging.log_analytics_workspace_id
 
+  # Enable all supported logs/metrics for baseline visibility.
+
   dynamic "enabled_log" {
     for_each = data.azurerm_monitor_diagnostic_categories.storage.logs
     content {
@@ -156,6 +165,7 @@ data "azurerm_monitor_diagnostic_categories" "law" {
 resource "azurerm_monitor_diagnostic_setting" "law" {
   name               = "${local.name_prefix}-diag-law"
   target_resource_id = module.logging.log_analytics_workspace_id
+  # Log Analytics cannot send diagnostics to itself; use storage for its own diagnostics.
   storage_account_id = module.logging.storage_account_id
 
   dynamic "enabled_log" {

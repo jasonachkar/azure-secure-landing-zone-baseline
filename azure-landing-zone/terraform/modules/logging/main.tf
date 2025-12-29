@@ -21,6 +21,7 @@ resource "azurerm_storage_account" "this" {
   tags                             = var.tags
 
   network_rules {
+    # Default deny blocks public access while still allowing trusted Azure services.
     default_action = "Deny"
     bypass         = ["AzureServices"]
   }

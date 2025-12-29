@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
+# Basic repo validation: required files plus Terraform formatting/validation.
 set -euo pipefail
 
+# Keep this list in sync with baseline repo requirements.
 required_files=(
   "README.md"
   "LICENSE"
@@ -41,6 +43,7 @@ fi
 echo "Required files present."
 
 if command -v terraform >/dev/null 2>&1; then
+  # Use backend=false to validate without a remote state dependency.
   terraform fmt -check -recursive terraform
   terraform -chdir=terraform/envs/dev init -backend=false
   terraform -chdir=terraform/envs/dev validate

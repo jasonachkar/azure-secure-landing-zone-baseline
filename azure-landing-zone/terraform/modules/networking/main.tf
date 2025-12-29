@@ -15,6 +15,7 @@ resource "azurerm_virtual_network" "spoke" {
 }
 
 locals {
+  # Build subnet maps once to drive both hub and spoke resources consistently.
   hub_subnets = {
     app  = var.hub_subnet_prefixes.app
     data = var.hub_subnet_prefixes.data
@@ -46,6 +47,7 @@ locals {
     }
   )
 
+  # Baseline NSG rules: deny Internet inbound, allow intra-vnet traffic.
   base_rules = [
     {
       name                       = "deny-internet-inbound"
@@ -101,6 +103,7 @@ resource "azurerm_network_security_group" "subnet" {
   }
 
   dynamic "security_rule" {
+    # Allow admin SSH/RDP only when an explicit allowlist is provided.
     for_each = (each.value.role == "mgmt" && length(var.admin_ip_allowlist) > 0) ? [1] : []
     content {
       name                       = "allow-admin-ssh-rdp"
@@ -124,6 +127,7 @@ resource "azurerm_subnet_network_security_group_association" "this" {
 
 resource "azurerm_subnet" "firewall" {
   count                = var.enable_firewall ? 1 : 0
+  # Azure Firewall requires the reserved subnet name.
   name                 = "AzureFirewallSubnet"
   resource_group_name  = var.resource_group_name
   virtual_network_name = azurerm_virtual_network.hub.name
@@ -132,6 +136,7 @@ resource "azurerm_subnet" "firewall" {
 
 resource "azurerm_public_ip" "firewall" {
   count               = var.enable_firewall ? 1 : 0
+  # Public IP is required by Azure Firewall when enabled.
   name                = "${var.name_prefix}-pip-fw"
   location            = var.location
   resource_group_name = var.resource_group_name

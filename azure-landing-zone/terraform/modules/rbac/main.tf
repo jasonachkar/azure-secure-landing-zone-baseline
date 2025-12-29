@@ -22,6 +22,7 @@ resource "azurerm_role_definition" "landing_zone_reader" {
 }
 
 resource "azurerm_role_assignment" "landing_zone_reader" {
+  # Skip assignments when no principal is supplied to keep the module reusable.
   count              = var.principal_object_id != null ? 1 : 0
   scope              = var.scope
   role_definition_id = azurerm_role_definition.landing_zone_reader.role_definition_resource_id
@@ -29,6 +30,7 @@ resource "azurerm_role_assignment" "landing_zone_reader" {
 }
 
 resource "azurerm_role_assignment" "reader" {
+  # Provide an example baseline Reader assignment when a principal is given.
   count                = var.principal_object_id != null ? 1 : 0
   scope                = var.scope
   role_definition_name = "Reader"
@@ -36,6 +38,7 @@ resource "azurerm_role_assignment" "reader" {
 }
 
 resource "azurerm_role_assignment" "log_analytics_reader" {
+  # Optional Log Analytics read access for the same principal.
   count                = var.principal_object_id != null ? 1 : 0
   scope                = var.scope
   role_definition_name = "Log Analytics Reader"

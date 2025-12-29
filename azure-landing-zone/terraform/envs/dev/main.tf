@@ -118,6 +118,7 @@ variable "storage_account_name" {
 }
 
 module "landing_zone" {
+  # Environment wrapper passes dev-specific variables into the root composition.
   source                   = "../.."
   project_name             = var.project_name
   environment              = var.environment

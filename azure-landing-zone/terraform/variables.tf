@@ -28,6 +28,7 @@ variable "tags" {
   type        = map(string)
   description = "Tags applied to all resources. Must include owner, environment, costCenter, dataClassification."
 
+  # Tag presence is validated here and enforced again via policy for defense in depth.
   validation {
     condition = alltrue([
       for k in ["owner", "environment", "costCenter", "dataClassification"] : contains(keys(var.tags), k)
@@ -114,6 +115,7 @@ variable "log_retention_days" {
 variable "storage_account_name" {
   type        = string
   description = "Optional storage account name override (3-24 lowercase alphanumeric)."
+  # Storage account names are global; override this if the generated name collides.
   default     = null
   nullable    = true
 }
