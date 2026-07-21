@@ -11,5 +11,11 @@ crash.*.log
 *.tmp
 .DS_Store
 
+# macOS metadata
+._*
+.AppleDouble
+.LSOverride
+__MACOSX/
+
 !terraform/envs/dev/dev.tfvars
 !terraform/envs/prod/prod.tfvars
