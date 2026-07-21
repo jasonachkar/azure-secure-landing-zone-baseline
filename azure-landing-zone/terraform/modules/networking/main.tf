@@ -31,18 +31,18 @@ locals {
   subnets = merge(
     {
       for name, prefix in local.hub_subnets : "hub-${name}" => {
-        role                 = name
-        vnet_name            = azurerm_virtual_network.hub.name
-        resource_group_name  = var.resource_group_name
-        address_prefixes     = [prefix]
+        role                = name
+        vnet_name           = azurerm_virtual_network.hub.name
+        resource_group_name = var.resource_group_name
+        address_prefixes    = [prefix]
       }
     },
     {
       for name, prefix in local.spoke_subnets : "spoke-${name}" => {
-        role                 = name
-        vnet_name            = azurerm_virtual_network.spoke.name
-        resource_group_name  = var.resource_group_name
-        address_prefixes     = [prefix]
+        role                = name
+        vnet_name           = azurerm_virtual_network.spoke.name
+        resource_group_name = var.resource_group_name
+        address_prefixes    = [prefix]
       }
     }
   )
@@ -126,7 +126,7 @@ resource "azurerm_subnet_network_security_group_association" "this" {
 }
 
 resource "azurerm_subnet" "firewall" {
-  count                = var.enable_firewall ? 1 : 0
+  count = var.enable_firewall ? 1 : 0
   # Azure Firewall requires the reserved subnet name.
   name                 = "AzureFirewallSubnet"
   resource_group_name  = var.resource_group_name
@@ -135,7 +135,7 @@ resource "azurerm_subnet" "firewall" {
 }
 
 resource "azurerm_public_ip" "firewall" {
-  count               = var.enable_firewall ? 1 : 0
+  count = var.enable_firewall ? 1 : 0
   # Public IP is required by Azure Firewall when enabled.
   name                = "${var.name_prefix}-pip-fw"
   location            = var.location

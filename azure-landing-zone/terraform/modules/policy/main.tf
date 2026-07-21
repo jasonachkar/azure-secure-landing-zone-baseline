@@ -1,18 +1,18 @@
 locals {
   # Load policy JSON so definitions stay source-of-truth in /policies.
-  require_tags              = jsondecode(file("${var.policy_path}/require-tags.json"))
-  allowed_locations         = jsondecode(file("${var.policy_path}/allowed-locations.json"))
-  deny_public_ip            = jsondecode(file("${var.policy_path}/deny-public-ip.json"))
-  deny_internet_ssh_rdp      = jsondecode(file("${var.policy_path}/deny-internet-ssh-rdp.json"))
-  storage_secure_transfer   = jsondecode(file("${var.policy_path}/storage-secure-transfer.json"))
-  storage_disable_public     = jsondecode(file("${var.policy_path}/storage-disable-public-access.json"))
-  audit_vm_disk_encryption   = jsondecode(file("${var.policy_path}/audit-vm-disk-encryption.json"))
-  audit_diagnostics          = jsondecode(file("${var.policy_path}/audit-diagnostics.json"))
+  require_tags             = jsondecode(file("${var.policy_path}/require-tags.json"))
+  allowed_locations        = jsondecode(file("${var.policy_path}/allowed-locations.json"))
+  deny_public_ip           = jsondecode(file("${var.policy_path}/deny-public-ip.json"))
+  deny_internet_ssh_rdp    = jsondecode(file("${var.policy_path}/deny-internet-ssh-rdp.json"))
+  storage_secure_transfer  = jsondecode(file("${var.policy_path}/storage-secure-transfer.json"))
+  storage_disable_public   = jsondecode(file("${var.policy_path}/storage-disable-public-access.json"))
+  audit_vm_disk_encryption = jsondecode(file("${var.policy_path}/audit-vm-disk-encryption.json"))
+  audit_diagnostics        = jsondecode(file("${var.policy_path}/audit-diagnostics.json"))
 
   # Centralize effects so we can flip enforcement without rewriting definitions.
   enforcement_effect = var.policy_enforcement_mode
   # Allow public IPs in dev by switching this policy to Audit only.
-  public_ip_effect   = var.allow_public_ip ? "Audit" : var.policy_enforcement_mode
+  public_ip_effect = var.allow_public_ip ? "Audit" : var.policy_enforcement_mode
 }
 
 resource "azurerm_policy_definition" "require_tags" {
@@ -103,9 +103,9 @@ resource "azurerm_policy_definition" "audit_diagnostics" {
   parameters   = jsonencode(local.audit_diagnostics.properties.parameters)
 }
 
-resource "azurerm_policy_assignment" "require_tags" {
+resource "azurerm_subscription_policy_assignment" "require_tags" {
   name                 = "${var.name_prefix}-require-tags"
-  scope                = var.scope
+  subscription_id      = var.scope
   policy_definition_id = azurerm_policy_definition.require_tags.id
   # Keep enforcement controlled via assignment parameters.
   parameters = jsonencode({
@@ -115,9 +115,9 @@ resource "azurerm_policy_assignment" "require_tags" {
   })
 }
 
-resource "azurerm_policy_assignment" "allowed_locations" {
+resource "azurerm_subscription_policy_assignment" "allowed_locations" {
   name                 = "${var.name_prefix}-allowed-locations"
-  scope                = var.scope
+  subscription_id      = var.scope
   policy_definition_id = azurerm_policy_definition.allowed_locations.id
   parameters = jsonencode({
     listOfAllowedLocations = {
@@ -129,9 +129,9 @@ resource "azurerm_policy_assignment" "allowed_locations" {
   })
 }
 
-resource "azurerm_policy_assignment" "deny_public_ip" {
+resource "azurerm_subscription_policy_assignment" "deny_public_ip" {
   name                 = "${var.name_prefix}-deny-public-ip"
-  scope                = var.scope
+  subscription_id      = var.scope
   policy_definition_id = azurerm_policy_definition.deny_public_ip.id
   parameters = jsonencode({
     effect = {
@@ -140,9 +140,9 @@ resource "azurerm_policy_assignment" "deny_public_ip" {
   })
 }
 
-resource "azurerm_policy_assignment" "deny_internet_ssh_rdp" {
+resource "azurerm_subscription_policy_assignment" "deny_internet_ssh_rdp" {
   name                 = "${var.name_prefix}-deny-internet-ssh-rdp"
-  scope                = var.scope
+  subscription_id      = var.scope
   policy_definition_id = azurerm_policy_definition.deny_internet_ssh_rdp.id
   parameters = jsonencode({
     allowedSourceIps = {
@@ -154,9 +154,9 @@ resource "azurerm_policy_assignment" "deny_internet_ssh_rdp" {
   })
 }
 
-resource "azurerm_policy_assignment" "storage_secure_transfer" {
+resource "azurerm_subscription_policy_assignment" "storage_secure_transfer" {
   name                 = "${var.name_prefix}-storage-secure-transfer"
-  scope                = var.scope
+  subscription_id      = var.scope
   policy_definition_id = azurerm_policy_definition.storage_secure_transfer.id
   parameters = jsonencode({
     effect = {
@@ -165,9 +165,9 @@ resource "azurerm_policy_assignment" "storage_secure_transfer" {
   })
 }
 
-resource "azurerm_policy_assignment" "storage_disable_public" {
+resource "azurerm_subscription_policy_assignment" "storage_disable_public" {
   name                 = "${var.name_prefix}-storage-disable-public"
-  scope                = var.scope
+  subscription_id      = var.scope
   policy_definition_id = azurerm_policy_definition.storage_disable_public.id
   parameters = jsonencode({
     effect = {
@@ -176,9 +176,9 @@ resource "azurerm_policy_assignment" "storage_disable_public" {
   })
 }
 
-resource "azurerm_policy_assignment" "audit_vm_disk_encryption" {
+resource "azurerm_subscription_policy_assignment" "audit_vm_disk_encryption" {
   name                 = "${var.name_prefix}-audit-vm-disk-encryption"
-  scope                = var.scope
+  subscription_id      = var.scope
   policy_definition_id = azurerm_policy_definition.audit_vm_disk_encryption.id
   parameters = jsonencode({
     effect = {
@@ -187,9 +187,9 @@ resource "azurerm_policy_assignment" "audit_vm_disk_encryption" {
   })
 }
 
-resource "azurerm_policy_assignment" "audit_diagnostics" {
+resource "azurerm_subscription_policy_assignment" "audit_diagnostics" {
   name                 = "${var.name_prefix}-audit-diagnostics"
-  scope                = var.scope
+  subscription_id      = var.scope
   policy_definition_id = azurerm_policy_definition.audit_diagnostics.id
   parameters = jsonencode({
     effect = {

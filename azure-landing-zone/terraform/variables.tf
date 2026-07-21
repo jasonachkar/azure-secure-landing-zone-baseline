@@ -124,8 +124,8 @@ variable "storage_account_name" {
   type        = string
   description = "Optional storage account name override (3-24 lowercase alphanumeric)."
   # Storage account names are global; override this if the generated name collides.
-  default     = null
-  nullable    = true
+  default  = null
+  nullable = true
 }
 
 variable "enable_defender_plans" {

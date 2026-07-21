@@ -16,6 +16,7 @@ resource "azurerm_monitor_action_group" "security" {
 resource "azurerm_monitor_activity_log_alert" "nsg_change" {
   name                = "${var.name_prefix}-alert-nsg-change"
   resource_group_name = var.resource_group_name
+  location            = "global"
   scopes              = [var.subscription_id]
   description         = "NSG security rule created, updated, or deleted."
   tags                = var.tags
@@ -33,6 +34,7 @@ resource "azurerm_monitor_activity_log_alert" "nsg_change" {
 resource "azurerm_monitor_activity_log_alert" "rbac_change" {
   name                = "${var.name_prefix}-alert-rbac-change"
   resource_group_name = var.resource_group_name
+  location            = "global"
   scopes              = [var.subscription_id]
   description         = "Subscription-level role assignment change — privilege escalation detection."
   tags                = var.tags
@@ -50,6 +52,7 @@ resource "azurerm_monitor_activity_log_alert" "rbac_change" {
 resource "azurerm_monitor_activity_log_alert" "policy_change" {
   name                = "${var.name_prefix}-alert-policy-change"
   resource_group_name = var.resource_group_name
+  location            = "global"
   scopes              = [var.subscription_id]
   description         = "Azure Policy assignment created or deleted."
   tags                = var.tags
@@ -68,6 +71,7 @@ resource "azurerm_monitor_activity_log_alert" "kv_policy_change" {
   count               = var.key_vault_id != null ? 1 : 0
   name                = "${var.name_prefix}-alert-kv-policy-change"
   resource_group_name = var.resource_group_name
+  location            = "global"
   scopes              = [var.key_vault_id]
   description         = "Key Vault access policy modified."
   tags                = var.tags

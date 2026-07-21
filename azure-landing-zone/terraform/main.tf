@@ -51,23 +51,23 @@ module "alerts" {
 }
 
 module "networking" {
-  source                  = "./modules/networking"
-  name_prefix             = local.name_prefix
-  resource_group_name     = azurerm_resource_group.network.name
-  location                = var.location
-  tags                    = local.tags
-  hub_vnet_address_space  = var.hub_vnet_address_space
+  source                   = "./modules/networking"
+  name_prefix              = local.name_prefix
+  resource_group_name      = azurerm_resource_group.network.name
+  location                 = var.location
+  tags                     = local.tags
+  hub_vnet_address_space   = var.hub_vnet_address_space
   spoke_vnet_address_space = var.spoke_vnet_address_space
-  hub_subnet_prefixes     = var.hub_subnet_prefixes
-  spoke_subnet_prefixes   = var.spoke_subnet_prefixes
-  admin_ip_allowlist      = var.admin_ip_allowlist
-  enable_firewall         = var.enable_firewall
+  hub_subnet_prefixes      = var.hub_subnet_prefixes
+  spoke_subnet_prefixes    = var.spoke_subnet_prefixes
+  admin_ip_allowlist       = var.admin_ip_allowlist
+  enable_firewall          = var.enable_firewall
 }
 
 module "policy" {
-  source                  = "./modules/policy"
-  name_prefix             = local.name_prefix
-  scope                   = data.azurerm_subscription.current.id
+  source      = "./modules/policy"
+  name_prefix = local.name_prefix
+  scope       = data.azurerm_subscription.current.id
   # Policy JSON stays in /policies and is registered here to keep IaC and rules in sync.
   policy_path             = "${path.module}/../policies"
   allowed_locations       = local.allowed_locations
@@ -108,17 +108,16 @@ resource "azurerm_monitor_diagnostic_setting" "vnet" {
   # Enable all supported logs/metrics for baseline visibility.
 
   dynamic "enabled_log" {
-    for_each = data.azurerm_monitor_diagnostic_categories.vnet[each.key].logs
+    for_each = toset(data.azurerm_monitor_diagnostic_categories.vnet[each.key].log_category_types)
     content {
-      category = enabled_log.value.category
-      enabled  = true
+      category = enabled_log.value
     }
   }
 
   dynamic "metric" {
-    for_each = data.azurerm_monitor_diagnostic_categories.vnet[each.key].metrics
+    for_each = toset(data.azurerm_monitor_diagnostic_categories.vnet[each.key].metrics)
     content {
-      category = metric.value.category
+      category = metric.value
       enabled  = true
     }
   }
@@ -139,17 +138,16 @@ resource "azurerm_monitor_diagnostic_setting" "nsg" {
   # Enable all supported logs/metrics for baseline visibility.
 
   dynamic "enabled_log" {
-    for_each = data.azurerm_monitor_diagnostic_categories.nsg[each.key].logs
+    for_each = toset(data.azurerm_monitor_diagnostic_categories.nsg[each.key].log_category_types)
     content {
-      category = enabled_log.value.category
-      enabled  = true
+      category = enabled_log.value
     }
   }
 
   dynamic "metric" {
-    for_each = data.azurerm_monitor_diagnostic_categories.nsg[each.key].metrics
+    for_each = toset(data.azurerm_monitor_diagnostic_categories.nsg[each.key].metrics)
     content {
-      category = metric.value.category
+      category = metric.value
       enabled  = true
     }
   }
@@ -168,17 +166,16 @@ resource "azurerm_monitor_diagnostic_setting" "storage" {
   # Enable all supported logs/metrics for baseline visibility.
 
   dynamic "enabled_log" {
-    for_each = data.azurerm_monitor_diagnostic_categories.storage.logs
+    for_each = toset(data.azurerm_monitor_diagnostic_categories.storage.log_category_types)
     content {
-      category = enabled_log.value.category
-      enabled  = true
+      category = enabled_log.value
     }
   }
 
   dynamic "metric" {
-    for_each = data.azurerm_monitor_diagnostic_categories.storage.metrics
+    for_each = toset(data.azurerm_monitor_diagnostic_categories.storage.metrics)
     content {
-      category = metric.value.category
+      category = metric.value
       enabled  = true
     }
   }
@@ -196,17 +193,16 @@ resource "azurerm_monitor_diagnostic_setting" "law" {
   storage_account_id = module.logging.storage_account_id
 
   dynamic "enabled_log" {
-    for_each = data.azurerm_monitor_diagnostic_categories.law.logs
+    for_each = toset(data.azurerm_monitor_diagnostic_categories.law.log_category_types)
     content {
-      category = enabled_log.value.category
-      enabled  = true
+      category = enabled_log.value
     }
   }
 
   dynamic "metric" {
-    for_each = data.azurerm_monitor_diagnostic_categories.law.metrics
+    for_each = toset(data.azurerm_monitor_diagnostic_categories.law.metrics)
     content {
-      category = metric.value.category
+      category = metric.value
       enabled  = true
     }
   }
@@ -223,17 +219,16 @@ resource "azurerm_monitor_diagnostic_setting" "key_vault" {
   log_analytics_workspace_id = module.logging.log_analytics_workspace_id
 
   dynamic "enabled_log" {
-    for_each = data.azurerm_monitor_diagnostic_categories.key_vault.logs
+    for_each = toset(data.azurerm_monitor_diagnostic_categories.key_vault.log_category_types)
     content {
-      category = enabled_log.value.category
-      enabled  = true
+      category = enabled_log.value
     }
   }
 
   dynamic "metric" {
-    for_each = data.azurerm_monitor_diagnostic_categories.key_vault.metrics
+    for_each = toset(data.azurerm_monitor_diagnostic_categories.key_vault.metrics)
     content {
-      category = metric.value.category
+      category = metric.value
       enabled  = true
     }
   }
