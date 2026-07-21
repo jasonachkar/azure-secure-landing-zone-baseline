@@ -52,11 +52,14 @@ variable "enable_firewall" {
   default     = true
 }
 
-variable "principal_object_id" {
-  type        = string
-  description = "Optional AAD principal object ID for role assignments."
-  default     = null
-  nullable    = true
+variable "rbac_assignments" {
+  type = list(object({
+    principal_id    = string
+    role_definition = string
+    description     = optional(string, "")
+  }))
+  description = "List of AAD principal-to-role mappings at subscription scope."
+  default     = []
 }
 
 variable "policy_enforcement_mode" {
@@ -132,7 +135,7 @@ module "landing_zone" {
   tags                     = var.tags
   admin_ip_allowlist       = var.admin_ip_allowlist
   enable_firewall          = var.enable_firewall
-  principal_object_id      = var.principal_object_id
+  rbac_assignments         = var.rbac_assignments
   policy_enforcement_mode  = var.policy_enforcement_mode
   allow_public_ip          = var.allow_public_ip
   hub_vnet_address_space   = var.hub_vnet_address_space

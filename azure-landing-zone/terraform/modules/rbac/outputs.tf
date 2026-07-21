@@ -1,4 +1,4 @@
-output "role_definition_id" {
-  description = "Custom LandingZoneReader role definition resource ID."
-  value       = azurerm_role_definition.landing_zone_reader.role_definition_resource_id
+output "role_assignment_ids" {
+  description = "Map of role assignment resource IDs keyed by principal-role pair."
+  value       = { for key, assignment in azurerm_role_assignment.this : key => assignment.id }
 }

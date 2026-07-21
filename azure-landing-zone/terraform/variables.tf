@@ -49,11 +49,14 @@ variable "enable_firewall" {
   default     = true
 }
 
-variable "principal_object_id" {
-  type        = string
-  description = "Optional AAD principal object ID for role assignments."
-  default     = null
-  nullable    = true
+variable "rbac_assignments" {
+  type = list(object({
+    principal_id    = string
+    role_definition = string
+    description     = optional(string, "")
+  }))
+  description = "List of AAD principal-to-role mappings at subscription scope. Use least-privilege roles."
+  default     = []
 }
 
 variable "policy_enforcement_mode" {

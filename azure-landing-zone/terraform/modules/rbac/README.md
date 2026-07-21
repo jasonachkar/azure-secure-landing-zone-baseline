@@ -1,11 +1,11 @@
 # RBAC Module
 
-Creates a custom read-only role and optionally assigns it (and basic reader roles) to a provided principal.
+Creates any number of Azure role assignments at a supplied scope. Each assignment maps one Microsoft Entra principal object ID to a built-in or custom role name.
 
 Inputs:
 - name_prefix: Prefix for role naming.
 - scope: Subscription or management group scope.
-- principal_object_id: Optional principal object ID for assignments.
+- rbac_assignments: List of principal IDs, role definition names, and optional descriptions.
 
 Outputs:
-- role_definition_id: Custom role definition resource ID.
+- role_assignment_ids: Map of assignment resource IDs keyed by principal-role pair.

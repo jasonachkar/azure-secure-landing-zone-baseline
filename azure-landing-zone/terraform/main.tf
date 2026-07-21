@@ -50,10 +50,10 @@ module "policy" {
 }
 
 module "rbac" {
-  source               = "./modules/rbac"
-  name_prefix          = local.name_prefix
-  scope                = data.azurerm_subscription.current.id
-  principal_object_id  = var.principal_object_id
+  source           = "./modules/rbac"
+  name_prefix      = local.name_prefix
+  scope            = data.azurerm_subscription.current.id
+  rbac_assignments = var.rbac_assignments
 }
 
 locals {
