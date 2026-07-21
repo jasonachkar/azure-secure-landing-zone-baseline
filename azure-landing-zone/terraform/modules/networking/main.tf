@@ -131,7 +131,14 @@ resource "azurerm_subnet" "firewall" {
   name                 = "AzureFirewallSubnet"
   resource_group_name  = var.resource_group_name
   virtual_network_name = azurerm_virtual_network.hub.name
-  address_prefixes     = [var.hub_subnet_prefixes.firewall]
+  address_prefixes     = [lookup(var.hub_subnet_prefixes, "firewall", "")]
+
+  lifecycle {
+    precondition {
+      condition     = contains(keys(var.hub_subnet_prefixes), "firewall")
+      error_message = "hub_subnet_prefixes must include firewall when enable_firewall is true."
+    }
+  }
 }
 
 resource "azurerm_public_ip" "firewall" {

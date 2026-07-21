@@ -39,10 +39,6 @@ variable "hub_subnet_prefixes" {
     error_message = "hub_subnet_prefixes must include app, data, and mgmt keys."
   }
 
-  validation {
-    condition     = !var.enable_firewall || contains(keys(var.hub_subnet_prefixes), "firewall")
-    error_message = "hub_subnet_prefixes must include firewall when enable_firewall is true."
-  }
 }
 
 variable "spoke_subnet_prefixes" {
