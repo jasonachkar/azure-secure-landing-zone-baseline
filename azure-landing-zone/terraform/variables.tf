@@ -45,8 +45,8 @@ variable "admin_ip_allowlist" {
 
 variable "enable_firewall" {
   type        = bool
-  description = "Whether to deploy Azure Firewall in the hub VNet."
-  default     = false
+  description = "Deploy Azure Firewall in hub VNet. Defaults to true for production-grade security. Set false only in dev/lab to reduce cost."
+  default     = true
 }
 
 variable "principal_object_id" {
