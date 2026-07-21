@@ -4,3 +4,10 @@
 .AppleDouble
 .LSOverride
 __MACOSX/
+
+# Terraform local state and generated files
+*.tfstate
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+backend.hcl

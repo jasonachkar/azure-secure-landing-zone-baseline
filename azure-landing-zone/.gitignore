@@ -1,12 +1,14 @@
 .terraform/
 .terraform.lock.hcl
 *.tfstate
+*.tfstate.backup
 *.tfstate.*
 *.tfplan
 *.tfvars
 *.tfvars.json
 crash.log
 crash.*.log
+backend.hcl
 *.bak
 *.tmp
 .DS_Store
