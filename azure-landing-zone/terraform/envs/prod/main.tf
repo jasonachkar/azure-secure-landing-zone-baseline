@@ -125,6 +125,19 @@ variable "storage_account_name" {
   nullable    = true
 }
 
+variable "enable_defender_plans" {
+  type        = list(string)
+  description = "Defender for Cloud resource types to enable at Standard tier."
+  default     = ["VirtualMachines", "StorageAccounts", "KeyVaults", "Arm", "Dns"]
+}
+
+variable "security_contact_email" {
+  type        = string
+  description = "Email address that receives Defender for Cloud security notifications."
+  default     = null
+  nullable    = true
+}
+
 module "landing_zone" {
   # Environment wrapper passes prod-specific variables into the root composition.
   source                   = "../.."
@@ -144,4 +157,6 @@ module "landing_zone" {
   spoke_subnet_prefixes    = var.spoke_subnet_prefixes
   log_retention_days       = var.log_retention_days
   storage_account_name     = var.storage_account_name
+  enable_defender_plans    = var.enable_defender_plans
+  security_contact_email   = var.security_contact_email
 }

@@ -23,6 +23,14 @@ module "logging" {
   storage_account_name = local.storage_account_name
 }
 
+module "defender" {
+  source                     = "./modules/defender"
+  scope                      = data.azurerm_subscription.current.id
+  log_analytics_workspace_id = module.logging.log_analytics_workspace_id
+  enable_defender_plans      = var.enable_defender_plans
+  security_contact_email     = var.security_contact_email
+}
+
 module "networking" {
   source                  = "./modules/networking"
   name_prefix             = local.name_prefix

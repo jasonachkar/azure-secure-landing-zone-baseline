@@ -127,3 +127,16 @@ variable "storage_account_name" {
   default     = null
   nullable    = true
 }
+
+variable "enable_defender_plans" {
+  type        = list(string)
+  description = "Defender for Cloud resource types to enable at Standard tier. Set to [] in dev to avoid cost."
+  default     = ["VirtualMachines", "StorageAccounts", "KeyVaults", "Arm", "Dns"]
+}
+
+variable "security_contact_email" {
+  type        = string
+  description = "Email address that receives Defender for Cloud security notifications."
+  default     = null
+  nullable    = true
+}
