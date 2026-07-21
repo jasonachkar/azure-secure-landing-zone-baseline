@@ -17,3 +17,13 @@ output "policy_assignment_ids" {
   description = "Policy assignment IDs created by the policy module."
   value       = module.policy.policy_assignment_ids
 }
+
+output "key_vault_id" {
+  description = "Key Vault resource ID."
+  value       = module.keyvault.key_vault_id
+}
+
+output "key_vault_uri" {
+  description = "Key Vault data-plane URI."
+  value       = module.keyvault.key_vault_uri
+}

@@ -31,6 +31,15 @@ module "defender" {
   security_contact_email     = var.security_contact_email
 }
 
+module "keyvault" {
+  source              = "./modules/keyvault"
+  name_prefix         = local.name_prefix
+  location            = var.location
+  resource_group_name = azurerm_resource_group.core.name
+  tags                = local.tags
+  admin_ip_allowlist  = var.admin_ip_allowlist
+}
+
 module "networking" {
   source                  = "./modules/networking"
   name_prefix             = local.name_prefix
@@ -186,6 +195,33 @@ resource "azurerm_monitor_diagnostic_setting" "law" {
 
   dynamic "metric" {
     for_each = data.azurerm_monitor_diagnostic_categories.law.metrics
+    content {
+      category = metric.value.category
+      enabled  = true
+    }
+  }
+}
+
+# Diagnostics for Key Vault
+data "azurerm_monitor_diagnostic_categories" "key_vault" {
+  resource_id = module.keyvault.key_vault_id
+}
+
+resource "azurerm_monitor_diagnostic_setting" "key_vault" {
+  name                       = "${local.name_prefix}-diag-key-vault"
+  target_resource_id         = module.keyvault.key_vault_id
+  log_analytics_workspace_id = module.logging.log_analytics_workspace_id
+
+  dynamic "enabled_log" {
+    for_each = data.azurerm_monitor_diagnostic_categories.key_vault.logs
+    content {
+      category = enabled_log.value.category
+      enabled  = true
+    }
+  }
+
+  dynamic "metric" {
+    for_each = data.azurerm_monitor_diagnostic_categories.key_vault.metrics
     content {
       category = metric.value.category
       enabled  = true

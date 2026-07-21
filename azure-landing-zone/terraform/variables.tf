@@ -39,7 +39,7 @@ variable "tags" {
 
 variable "admin_ip_allowlist" {
   type        = list(string)
-  description = "Optional list of CIDR ranges allowed to access management ports (SSH/RDP)."
+  description = "CIDR blocks allowed to access Key Vault and management subnets."
   default     = []
 }
 
