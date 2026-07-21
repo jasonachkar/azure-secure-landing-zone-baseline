@@ -40,6 +40,16 @@ module "keyvault" {
   admin_ip_allowlist  = var.admin_ip_allowlist
 }
 
+module "alerts" {
+  source                = "./modules/alerts"
+  name_prefix           = local.name_prefix
+  resource_group_name   = azurerm_resource_group.core.name
+  subscription_id       = data.azurerm_subscription.current.id
+  tags                  = local.tags
+  key_vault_id          = module.keyvault.key_vault_id
+  alert_email_addresses = var.alert_email_addresses
+}
+
 module "networking" {
   source                  = "./modules/networking"
   name_prefix             = local.name_prefix

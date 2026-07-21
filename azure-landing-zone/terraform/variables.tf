@@ -140,3 +140,9 @@ variable "security_contact_email" {
   default     = null
   nullable    = true
 }
+
+variable "alert_email_addresses" {
+  type        = list(string)
+  description = "Email addresses that receive Azure Monitor security activity alerts."
+  default     = []
+}

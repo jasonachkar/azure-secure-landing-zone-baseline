@@ -138,6 +138,12 @@ variable "security_contact_email" {
   nullable    = true
 }
 
+variable "alert_email_addresses" {
+  type        = list(string)
+  description = "Email addresses that receive Azure Monitor security activity alerts."
+  default     = []
+}
+
 module "landing_zone" {
   # Environment wrapper passes dev-specific variables into the root composition.
   source                   = "../.."
@@ -159,4 +165,5 @@ module "landing_zone" {
   storage_account_name     = var.storage_account_name
   enable_defender_plans    = var.enable_defender_plans
   security_contact_email   = var.security_contact_email
+  alert_email_addresses    = var.alert_email_addresses
 }

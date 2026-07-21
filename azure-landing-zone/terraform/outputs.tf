@@ -27,3 +27,8 @@ output "key_vault_uri" {
   description = "Key Vault data-plane URI."
   value       = module.keyvault.key_vault_uri
 }
+
+output "security_action_group_id" {
+  description = "Azure Monitor security action group resource ID."
+  value       = module.alerts.action_group_id
+}
