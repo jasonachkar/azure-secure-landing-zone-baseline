@@ -79,7 +79,7 @@ The references below use [CIS Controls v8.1](https://www.cisecurity.org/controls
 ### Network
 
 - Internet-origin inbound traffic is denied on every managed subnet; management SSH/RDP is allowed only from an explicit CIDR allowlist (CIS 12.2, 12.3).
-- Azure Firewall is enabled by default and may be disabled explicitly for cost-controlled development environments (CIS 12.2, 13.3).
+- Azure Firewall Premium is enabled by default, attached to a dedicated Firewall Policy, and runs threat intelligence and IDPS in deny mode; development may opt out explicitly for cost control (CIS 12.2, 13.3).
 - Hub and spoke address spaces are isolated and connected through explicit peerings (CIS 12.2).
 - Public IP creation and unrestricted SSH/RDP are governed by subscription policy (CIS 4.1, 12.2).
 
@@ -92,11 +92,12 @@ The references below use [CIS Controls v8.1](https://www.cisecurity.org/controls
 ### Data Protection
 
 - Terraform state is stored in Azure Blob Storage, encrypted at rest by Azure Storage and locked by blob lease (CIS 3.11).
-- Storage requires HTTPS and TLS 1.2, disables anonymous nested-item publication, and applies default-deny network rules (CIS 3.10, 3.11, 12.2).
-- Key Vault enables 90-day soft-delete retention, purge protection, public-network denial, and network ACLs (CIS 3.3, 3.11).
+- Diagnostics storage uses GRS, infrastructure encryption, a rotating Key Vault customer-managed key, Azure AD authorization by default, disabled Shared Key/local users, versioning, soft delete, SAS expiry policy, and queue request logging (CIS 3.10, 3.11, 8.5).
+- Storage and Key Vault deny public-network access and expose private endpoints through the spoke data subnet; private DNS zones are linked to both hub and spoke VNets (CIS 3.3, 3.11, 12.2).
+- Key Vault Premium enables 90-day soft-delete retention, purge protection, a rotating HSM-backed storage-encryption key, and a least-privilege user-assigned CMK identity (CIS 3.3, 3.11, 6.8).
 - The VM disk-encryption policy audits workloads that lack a disk encryption set (CIS 3.11).
 
-Key Vault public access is intentionally disabled. A workload that needs Key Vault data-plane access must add a private endpoint and private DNS integration appropriate to its network topology.
+Key Vault key creation and other data-plane operations must run from a host that can resolve the private DNS zone and reach the hub/spoke network, such as a VPN-connected administrator or self-hosted runner.
 
 ### Compliance & Audit
 
@@ -303,6 +304,7 @@ Never apply a saved plan from an untrusted source. Review the plan output and ob
 | `storage_account_name` | `string` | `null` | Optional globally unique diagnostics storage name override. |
 | `enable_defender_plans` | `list(string)` | VM, Storage, Key Vault, ARM, DNS | Defender resource types enabled at Standard tier. |
 | `security_contact_email` | `string` | `null` | Optional Defender for Cloud notification contact. |
+| `security_contact_phone` | `string` | Required | Defender security-contact phone in E.164 format. |
 | `alert_email_addresses` | `list(string)` | `[]` | Email receivers created in the Azure Monitor action group. |
 
 ## Per-Environment Deployment

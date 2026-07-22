@@ -33,3 +33,23 @@ variable "storage_account_name" {
   type        = string
   description = "Storage account name for diagnostics storage."
 }
+
+variable "private_endpoint_subnet_id" {
+  type        = string
+  description = "Subnet ID used by the diagnostics storage private endpoint."
+}
+
+variable "virtual_network_ids" {
+  type        = map(string)
+  description = "Virtual network IDs linked to the storage private DNS zone."
+}
+
+variable "customer_managed_key_id" {
+  type        = string
+  description = "Versioned Key Vault key ID used for storage encryption."
+}
+
+variable "customer_managed_key_identity_id" {
+  type        = string
+  description = "User-assigned identity ID authorized to use the storage encryption key."
+}

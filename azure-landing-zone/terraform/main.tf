@@ -14,13 +14,17 @@ resource "azurerm_resource_group" "network" {
 }
 
 module "logging" {
-  source               = "./modules/logging"
-  name_prefix          = local.name_prefix
-  resource_group_name  = azurerm_resource_group.core.name
-  location             = var.location
-  tags                 = local.tags
-  log_retention_days   = var.log_retention_days
-  storage_account_name = local.storage_account_name
+  source                           = "./modules/logging"
+  name_prefix                      = local.name_prefix
+  resource_group_name              = azurerm_resource_group.core.name
+  location                         = var.location
+  tags                             = local.tags
+  log_retention_days               = var.log_retention_days
+  storage_account_name             = local.storage_account_name
+  private_endpoint_subnet_id       = module.networking.subnet_ids["spoke-data"]
+  virtual_network_ids              = module.networking.vnet_ids
+  customer_managed_key_id          = module.keyvault.storage_encryption_key_id
+  customer_managed_key_identity_id = module.keyvault.storage_encryption_identity_id
 }
 
 module "defender" {
@@ -29,15 +33,18 @@ module "defender" {
   log_analytics_workspace_id = module.logging.log_analytics_workspace_id
   enable_defender_plans      = var.enable_defender_plans
   security_contact_email     = var.security_contact_email
+  security_contact_phone     = var.security_contact_phone
 }
 
 module "keyvault" {
-  source              = "./modules/keyvault"
-  name_prefix         = local.name_prefix
-  location            = var.location
-  resource_group_name = azurerm_resource_group.core.name
-  tags                = local.tags
-  admin_ip_allowlist  = var.admin_ip_allowlist
+  source                     = "./modules/keyvault"
+  name_prefix                = local.name_prefix
+  location                   = var.location
+  resource_group_name        = azurerm_resource_group.core.name
+  tags                       = local.tags
+  admin_ip_allowlist         = var.admin_ip_allowlist
+  private_endpoint_subnet_id = module.networking.subnet_ids["spoke-data"]
+  virtual_network_ids        = module.networking.vnet_ids
 }
 
 module "alerts" {

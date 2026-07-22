@@ -13,6 +13,19 @@ output "nsg_ids" {
   value       = { for key, nsg in azurerm_network_security_group.subnet : key => nsg.id }
 }
 
+output "subnet_ids" {
+  description = "Map of subnet IDs keyed by hub/spoke role."
+  value       = { for key, subnet in azurerm_subnet.this : key => subnet.id }
+}
+
+output "vnet_ids" {
+  description = "Map of hub and spoke virtual network IDs."
+  value = {
+    hub   = azurerm_virtual_network.hub.id
+    spoke = azurerm_virtual_network.spoke.id
+  }
+}
+
 output "firewall_id" {
   description = "Azure Firewall resource ID if enabled."
   value       = var.enable_firewall ? azurerm_firewall.this[0].id : null

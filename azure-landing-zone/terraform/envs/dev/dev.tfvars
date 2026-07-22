@@ -13,10 +13,11 @@ log_retention_days      = 30      # Lowest permitted retention for short-lived d
 policy_enforcement_mode = "Audit" # Report policy violations without blocking test deployments.
 allow_public_ip         = true    # Audit public IP creation for development testing.
 
-enable_defender_plans  = []   # Disable paid Defender plans in this cost-optimized environment.
-security_contact_email = null # Do not create a Defender security contact in this example.
-alert_email_addresses  = []   # Create the action group without email receivers.
-rbac_assignments       = []   # Add explicit development principals when required.
+enable_defender_plans  = []             # Disable paid Defender plans in this cost-optimized environment.
+security_contact_email = null           # Do not create a Defender security contact in this example.
+security_contact_phone = "+14165550100" # Required E.164 input; unused while the contact email is null.
+alert_email_addresses  = []             # Create the action group without email receivers.
+rbac_assignments       = []             # Add explicit development principals when required.
 
 hub_vnet_address_space   = ["10.10.0.0/16"] # Development hub address space.
 spoke_vnet_address_space = ["10.11.0.0/16"] # Development workload spoke address space.

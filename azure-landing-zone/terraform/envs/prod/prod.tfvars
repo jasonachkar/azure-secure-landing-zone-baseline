@@ -22,6 +22,7 @@ enable_defender_plans = [ # Enable paid Defender protection for core production 
 ]
 
 security_contact_email = "security-team@example.com"   # Defender for Cloud notification contact.
+security_contact_phone = "+14165550100"                # Replace with the security team's E.164 phone number.
 alert_email_addresses  = ["security-team@example.com"] # Azure Monitor security-alert recipient.
 
 rbac_assignments = [ # Subscription-scope least-privilege assignments.

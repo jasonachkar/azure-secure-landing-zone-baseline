@@ -141,6 +141,17 @@ variable "security_contact_email" {
   nullable    = true
 }
 
+variable "security_contact_phone" {
+  type        = string
+  description = "E.164 phone number for the Defender for Cloud security contact."
+  nullable    = false
+
+  validation {
+    condition     = can(regex("^\\+[1-9][0-9]{7,14}$", var.security_contact_phone))
+    error_message = "security_contact_phone must be a valid E.164 number, for example +14165550100."
+  }
+}
+
 variable "alert_email_addresses" {
   type        = list(string)
   description = "Email addresses that receive Azure Monitor security activity alerts."

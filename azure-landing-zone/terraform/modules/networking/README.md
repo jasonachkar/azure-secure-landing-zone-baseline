@@ -1,6 +1,6 @@
 # Networking Module
 
-Creates a hub-and-spoke network baseline with subnets, NSGs, and peering. An optional Azure Firewall can be enabled for centralized egress control.
+Creates a hub-and-spoke network baseline with subnets, NSGs, and peering. The optional Azure Firewall Premium uses a dedicated Firewall Policy with threat intelligence and IDPS in deny mode.
 
 Inputs:
 - name_prefix: Prefix for resource naming.
@@ -18,4 +18,6 @@ Outputs:
 - hub_vnet_id: Hub VNet ID.
 - spoke_vnet_id: Spoke VNet ID.
 - nsg_ids: Map of NSG IDs keyed by subnet.
+- subnet_ids: Map of subnet IDs keyed by hub/spoke role.
+- vnet_ids: Map containing the hub and spoke VNet IDs.
 - firewall_id: Firewall ID when enabled.

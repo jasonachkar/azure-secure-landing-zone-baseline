@@ -147,6 +147,12 @@ variable "security_contact_email" {
   nullable    = true
 }
 
+variable "security_contact_phone" {
+  type        = string
+  description = "E.164 phone number for the Defender for Cloud security contact."
+  nullable    = false
+}
+
 variable "alert_email_addresses" {
   type        = list(string)
   description = "Email addresses that receive Azure Monitor security activity alerts."
@@ -174,5 +180,6 @@ module "landing_zone" {
   storage_account_name     = var.storage_account_name
   enable_defender_plans    = var.enable_defender_plans
   security_contact_email   = var.security_contact_email
+  security_contact_phone   = var.security_contact_phone
   alert_email_addresses    = var.alert_email_addresses
 }

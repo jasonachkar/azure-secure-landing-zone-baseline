@@ -79,7 +79,7 @@ References use [CIS Controls v8.1](https://www.cisecurity.org/controls/v8-1) saf
 
 - Every managed subnet has an NSG that denies inbound Internet traffic (CIS 12.2, 12.3).
 - Management SSH/RDP is opened only when `admin_ip_allowlist` contains explicit CIDRs (CIS 12.3).
-- Azure Firewall defaults to enabled; development must opt out explicitly (CIS 12.2, 13.3).
+- Azure Firewall Premium defaults to enabled, uses a dedicated Firewall Policy, and enforces threat intelligence and IDPS in deny mode; development must opt out explicitly (CIS 12.2, 13.3).
 - Policy denies public IPs and unrestricted SSH/RDP in production (CIS 4.1, 12.2).
 
 ### Identity & Access
@@ -91,11 +91,12 @@ References use [CIS Controls v8.1](https://www.cisecurity.org/controls/v8-1) saf
 ### Data Protection
 
 - Remote Azure Blob state is encrypted at rest and lockable (CIS 3.11).
-- Storage requires HTTPS/TLS 1.2, prevents anonymous item publication, and defaults network access rules to deny (CIS 3.10, 3.11, 12.2).
-- Key Vault uses 90-day soft delete, purge protection, public-network denial, and ACLs (CIS 3.3, 3.11).
+- Diagnostics storage uses GRS, infrastructure encryption, a rotating Key Vault customer-managed key, Azure AD authorization by default, disabled Shared Key/local users, versioning, soft delete, SAS expiry policy, and queue request logging (CIS 3.10, 3.11, 8.5).
+- Storage and Key Vault deny public-network access and use private endpoints in the spoke data subnet with private DNS linked to both VNets (CIS 3.3, 3.11, 12.2).
+- Key Vault Premium uses 90-day soft delete, purge protection, a rotating HSM-backed key, and a least-privilege user-assigned storage-encryption identity (CIS 3.3, 3.11, 6.8).
 - Azure Policy audits VM disk-encryption configuration (CIS 3.11).
 
-The baseline disables Key Vault public access but does not create a private endpoint. Add private endpoint and private DNS resources in the workload topology before applications use the vault data plane.
+Key Vault data-plane operations must run from a VPN-connected host or self-hosted runner that can resolve the private DNS zone and reach the hub/spoke network.
 
 ### Compliance & Audit
 
@@ -287,6 +288,7 @@ Review the saved plan and obtain required approval before applying it.
 | `storage_account_name` | `string` | `null` | Optional diagnostics storage name override. |
 | `enable_defender_plans` | `list(string)` | VM, Storage, Key Vault, ARM, DNS | Standard-tier Defender resource types. |
 | `security_contact_email` | `string` | `null` | Optional Defender security contact. |
+| `security_contact_phone` | `string` | Required | Defender security-contact phone in E.164 format. |
 | `alert_email_addresses` | `list(string)` | `[]` | Azure Monitor action-group recipients. |
 
 ## Per-Environment Deployment

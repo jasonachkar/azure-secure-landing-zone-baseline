@@ -152,13 +152,29 @@ resource "azurerm_public_ip" "firewall" {
   tags                = var.tags
 }
 
+resource "azurerm_firewall_policy" "this" {
+  count                    = var.enable_firewall ? 1 : 0
+  name                     = "${var.name_prefix}-fw-policy"
+  resource_group_name      = var.resource_group_name
+  location                 = var.location
+  sku                      = "Premium"
+  threat_intelligence_mode = "Deny"
+  tags                     = var.tags
+
+  intrusion_detection {
+    mode = "Deny"
+  }
+}
+
 resource "azurerm_firewall" "this" {
   count               = var.enable_firewall ? 1 : 0
   name                = "${var.name_prefix}-fw"
   location            = var.location
   resource_group_name = var.resource_group_name
   sku_name            = "AZFW_VNet"
-  sku_tier            = "Standard"
+  sku_tier            = "Premium"
+  firewall_policy_id  = azurerm_firewall_policy.this[0].id
+  threat_intel_mode   = "Deny"
   tags                = var.tags
 
   ip_configuration {
