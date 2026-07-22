@@ -8,6 +8,18 @@ __MACOSX/
 # Terraform local state and generated files
 *.tfstate
 *.tfstate.backup
+*.tfstate.*
 .terraform/
 .terraform.lock.hcl
 backend.hcl
+*.tfplan
+*.tfvars
+*.tfvars.json
+crash.log
+crash.*.log
+*.bak
+*.tmp
+
+# Keep the reviewed environment examples under version control.
+!terraform/envs/dev/dev.tfvars
+!terraform/envs/prod/prod.tfvars

@@ -3,13 +3,13 @@ name: Terraform Security Scan
 on:
   pull_request:
     paths:
-      - "azure-landing-zone/terraform/**"
-      - "azure-landing-zone/policies/**"
+      - "terraform/**"
+      - "policies/**"
   push:
     branches: [main]
     paths:
-      - "azure-landing-zone/terraform/**"
-      - "azure-landing-zone/policies/**"
+      - "terraform/**"
+      - "policies/**"
 
 permissions:
   contents: read
@@ -25,7 +25,7 @@ jobs:
       - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3
         with: { terraform_version: "~1.6" }
       - run: terraform fmt -check -recursive
-        working-directory: azure-landing-zone/terraform
+        working-directory: terraform
 
   validate:
     name: Terraform Validate
@@ -38,9 +38,9 @@ jobs:
       - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3
         with: { terraform_version: "~1.6" }
       - run: terraform init -backend=false
-        working-directory: azure-landing-zone/terraform
+        working-directory: terraform
       - run: terraform validate
-        working-directory: azure-landing-zone/terraform
+        working-directory: terraform
 
   checkov:
     name: Checkov IaC Scan
@@ -55,7 +55,7 @@ jobs:
           persist-credentials: false
       - uses: bridgecrewio/checkov-action@7b972723c44fb3d256283fac96fae5d7c1894bb7 # v12.3114.0
         with:
-          directory: azure-landing-zone/terraform
+          directory: terraform
           framework: terraform
           output_format: sarif
           output_file_path: checkov-results.sarif
@@ -93,14 +93,14 @@ jobs:
           chmod +x "${install_dir}/tfsec"
           echo "${install_dir}" >> "${GITHUB_PATH}"
       - name: Generate tfsec SARIF
-        run: tfsec --soft-fail --format sarif --out tfsec-results.sarif azure-landing-zone/terraform
+        run: tfsec --soft-fail --format sarif --out tfsec-results.sarif terraform
       - uses: github/codeql-action/upload-sarif@08d09a53f0f5d694f253bd25732e4429c9e9337f # v3
         if: always()
         with:
           sarif_file: tfsec-results.sarif
           category: tfsec
       - name: Enforce tfsec findings
-        run: tfsec azure-landing-zone/terraform
+        run: tfsec terraform
 
   trivy:
     name: Trivy Misconfiguration Scan
@@ -117,7 +117,7 @@ jobs:
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           scan-type: config
-          scan-ref: azure-landing-zone/terraform
+          scan-ref: terraform
           skip-dirs: envs
           format: sarif
           output: trivy-results.sarif
@@ -133,7 +133,7 @@ jobs:
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           scan-type: config
-          scan-ref: azure-landing-zone/terraform
+          scan-ref: terraform
           skip-dirs: envs
           format: table
           severity: HIGH,CRITICAL
@@ -149,6 +149,6 @@ jobs:
           persist-credentials: false
       - name: Validate JSON
         run: |
-          for f in azure-landing-zone/policies/*.json; do
+          for f in policies/*.json; do
             python3 -m json.tool "$f" > /dev/null && echo "OK: $f" || exit 1
           done

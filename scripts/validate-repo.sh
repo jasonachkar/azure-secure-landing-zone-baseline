@@ -2,12 +2,15 @@
 # Basic repo validation: required files plus Terraform formatting/validation.
 set -euo pipefail
 
+script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+repo_root=$(cd -- "${script_dir}/.." && pwd)
+cd "${repo_root}"
+
 # Keep this list in sync with baseline repo requirements.
 required_files=(
   "README.md"
   "LICENSE"
   ".github/workflows/terraform-security.yml"
-  "../.github/workflows/terraform-security.yml"
   "docs/architecture.puml"
   "docs/decisions.md"
   "docs/threat-model.md"

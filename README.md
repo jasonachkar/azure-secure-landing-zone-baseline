@@ -3,7 +3,7 @@
 [![Terraform Security Scan](https://github.com/jasonachkar/azure-secure-landing-zone-baseline/actions/workflows/terraform-security.yml/badge.svg)](https://github.com/jasonachkar/azure-secure-landing-zone-baseline/actions/workflows/terraform-security.yml)
 [![tfsec](https://img.shields.io/badge/tfsec-enabled-2A6DB2?logo=aqua&logoColor=white)](https://github.com/aquasecurity/tfsec)
 [![Checkov](https://img.shields.io/badge/Checkov-enabled-6B57FF)](https://www.checkov.io/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](azure-landing-zone/LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Terraform >= 1.6](https://img.shields.io/badge/Terraform-%3E%3D%201.6-844FBA?logo=terraform)](https://developer.hashicorp.com/terraform/install)
 [![Microsoft Azure](https://img.shields.io/badge/Microsoft_Azure-0078D4?logo=microsoftazure&logoColor=white)](https://azure.microsoft.com/)
 
@@ -111,34 +111,27 @@ Key Vault key creation and other data-plane operations must run from a host that
 
 ```text
 .
-├── .github/workflows/terraform-security.yml       # Active repository-level GitHub security workflow.
-├── README.md                                       # Repository overview and operating guide.
-└── azure-landing-zone/
-    ├── .github/workflows/terraform-security.yml   # Project-local workflow source required by the baseline layout.
-    ├── docs/                                       # Architecture decisions, PlantUML, and threat model.
-    ├── policies/                                   # Eight custom Azure Policy JSON definitions.
-    ├── scripts/
-    │   ├── preflight.sh                            # Verifies Azure CLI/Terraform and active subscription context.
-    │   └── validate-repo.sh                        # Checks required files, formatting, init, and validation.
-    └── terraform/
-        ├── backend.hcl.example                     # Safe remote-backend template; backend.hcl is ignored.
-        ├── versions.tf                             # Terraform >=1.6, AzureRM ~>4.0, and azurerm backend.
-        ├── providers.tf                            # AzureRM feature and deletion-safety configuration.
-        ├── variables.tf                            # Public module interface and input validation.
-        ├── locals.tf                               # Deterministic names, tags, regions, and storage naming.
-        ├── main.tf                                 # Root composition and diagnostic settings.
-        ├── outputs.tf                              # Network, logging, policy, Key Vault, and alert outputs.
-        ├── modules/
-        │   ├── alerts/                             # Action group and security activity-log alerts.
-        │   ├── defender/                           # Defender plans, workspace connection, and contact.
-        │   ├── keyvault/                           # Hardened Key Vault and deployer access policy.
-        │   ├── logging/                            # Log Analytics and diagnostic storage.
-        │   ├── networking/                         # Hub/spoke VNets, NSGs, peering, and Firewall.
-        │   ├── policy/                             # Policy definition loading and subscription assignments.
-        │   └── rbac/                               # Multiple principal/role assignments via for_each.
-        └── envs/
-            ├── dev/                                # Development wrapper, backend, and complete tfvars.
-            └── prod/                               # Production wrapper, backend, and complete tfvars.
+├── .github/workflows/terraform-security.yml       # Active GitHub security workflow.
+├── docs/                                           # Architecture decisions, PlantUML, and threat model.
+├── policies/                                       # Eight custom Azure Policy JSON definitions.
+├── scripts/
+│   ├── preflight.sh                                # Verifies Azure CLI/Terraform and active subscription context.
+│   └── validate-repo.sh                            # Checks required files, formatting, init, and validation.
+├── terraform/
+│   ├── backend.hcl.example                         # Safe remote-backend template; backend.hcl is ignored.
+│   ├── versions.tf                                 # Terraform >=1.6, AzureRM ~>4.0, and azurerm backend.
+│   ├── providers.tf                                # AzureRM feature and deletion-safety configuration.
+│   ├── variables.tf                                # Public module interface and input validation.
+│   ├── locals.tf                                   # Deterministic names, tags, regions, and storage naming.
+│   ├── main.tf                                     # Root composition and diagnostic settings.
+│   ├── outputs.tf                                  # Network, logging, policy, Key Vault, and alert outputs.
+│   ├── modules/                                    # Alerts, Defender, Key Vault, logging, networking, policy, and RBAC.
+│   └── envs/
+│       ├── dev/                                    # Development wrapper, backend, and complete tfvars.
+│       └── prod/                                   # Production wrapper, backend, and complete tfvars.
+├── .editorconfig                                   # Repository formatting defaults.
+├── LICENSE                                         # MIT license.
+└── README.md                                       # Repository overview and operating guide.
 ```
 
 ## Azure Policies
@@ -174,7 +167,7 @@ push to main / pull request
                                   └──────────── SARIF uploaded to GitHub Security ─┘
 ```
 
-All scanners are enforcing: Checkov uses `soft_fail: false`; Trivy fails on HIGH or CRITICAL findings; tfsec propagates its action result.
+All scanners are enforcing: Checkov uses `soft_fail: false`; Trivy fails on HIGH or CRITICAL findings; tfsec is checksum-verified and fails on any reported finding.
 
 ## Prerequisites
 
@@ -194,7 +187,7 @@ The deploying identity needs subscription permissions to create resource groups 
 
 ```bash
 git clone https://github.com/jasonachkar/azure-secure-landing-zone-baseline.git
-cd azure-secure-landing-zone-baseline/azure-landing-zone
+cd azure-secure-landing-zone-baseline
 ```
 
 ### 2. Authenticate and select the subscription
@@ -311,10 +304,10 @@ Never apply a saved plan from an untrusted source. Review the plan output and ob
 
 The complete examples are:
 
-- Development: `azure-landing-zone/terraform/envs/dev/dev.tfvars`
-- Production: `azure-landing-zone/terraform/envs/prod/prod.tfvars`
+- Development: `terraform/envs/dev/dev.tfvars`
+- Production: `terraform/envs/prod/prod.tfvars`
 
-From the `azure-landing-zone` directory, select a variable file explicitly:
+From the repository root, select a variable file explicitly:
 
 ```bash
 terraform -chdir=terraform plan -var-file=envs/dev/dev.tfvars
@@ -361,7 +354,7 @@ This mapping identifies supporting technical controls, not complete framework co
 
 1. Fork the repository and create a focused branch such as `feat/private-endpoints` or `fix/policy-parameters`.
 2. Use Conventional Commits (`feat:`, `fix:`, `security:`, `docs:`, `ci:`, `chore:`) and keep unrelated changes in separate commits.
-3. Run `terraform fmt -check -recursive`, `terraform init -backend=false`, `terraform validate`, and the policy JSON lint before opening a pull request.
+3. Run `terraform -chdir=terraform fmt -check -recursive`, `terraform -chdir=terraform init -backend=false`, `terraform -chdir=terraform validate`, and the policy JSON lint before opening a pull request.
 4. Update documentation and environment examples when the module interface changes.
 5. Open a pull request that explains risk, expected plan changes, validation evidence, and any migration steps. Obtain review before merge; do not commit state, credentials, plans, or `backend.hcl`.
 
@@ -369,4 +362,4 @@ Security-sensitive findings should be reported privately to the repository owner
 
 ## License
 
-Licensed under the [MIT License](azure-landing-zone/LICENSE).
+Licensed under the [MIT License](LICENSE).
